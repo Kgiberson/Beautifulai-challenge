@@ -75,8 +75,7 @@ class SimpleBox extends BaseElement {
     render() {
         this.$el = $("<div/>");
         this.$el.addClass("element simplebox");
-
-        this.$el.text(this.label);
+        this.$el.text(this.parentElement.slideCount);
 
         return this.$el;
     }
@@ -96,22 +95,19 @@ class SimpleBox extends BaseElement {
 
       $button.on("click", () => {
           let selectedBoxForDeletion = $(this.$el);
-          // debugger;
-          this.removeChildElement(selectedBoxForDeletion);
+          this.removeElement(selectedBoxForDeletion);
       });
     }
 
-    removeChildElement(element) {
-        // debugger;
-        var index = this.label;
+    removeElement(element) {
+        var label = this.label;
         element.remove();
-        this.parentElement.childElements.splice(index - 1, 1);
-        this.parentElement.childElements.forEach(function(element) {
-          if (element.label > index) {
+        this.parentElement.childElements.splice(label - 1, 1);
+        this.parentElement.childElements.forEach(function(element, index) {
+          if (element.label > label) {
             element.label--;
           };
         })
-        // debugger;
         this.parentElement.layout();
     }
 }
@@ -132,9 +128,7 @@ class SimpleContainer extends BaseElement {
 
     layout(){
       let simpleBoxWidth = ((window.innerWidth - 120) / this.childElements.length)
-      // debugger;
       this.childElements.forEach(function(element, index) {
-        debugger;
         element.layout({
           top: (window.innerHeight - 100) / 3,
           left: (simpleBoxWidth * index) + 20,
@@ -149,7 +143,7 @@ class SimpleContainer extends BaseElement {
         this.$el.append($button);
 
         $button.on("click", () => {
-            this.addChildElement(new SimpleBox(this.slideCount));
+            this.addChildElement(new SimpleBox(this.childElements.length + 1));
         });
     }
 
