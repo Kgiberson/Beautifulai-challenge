@@ -5,6 +5,8 @@ class App {
 
         this.canvas.addElement(new SimpleContainer());
 
+
+
         this.canvas.layout(false);
         $(window).on("resize", () => {
             this.canvas.layout(false);
@@ -53,7 +55,7 @@ class BaseElement {
 
     layout(bounds, animate) {
         if (animate) {
-            this.$el.animate(bounds);
+            this.$el.animate(bounds, 500);
         } else{
             this.$el.css(bounds);
         }
@@ -78,33 +80,76 @@ class SimpleBox extends BaseElement {
 
         return this.$el;
     }
+
+    renderUI() {
+      var $button = $("<div/>").addClass("control").text("delete");
+      $button.css({
+        backgroundColor: 'indianred',
+        fontSize: '12px',
+        left: '5px',
+        minWidth: '50px',
+        padding: '5px',
+        top: '5px',
+        width: '10%'
+      });
+      this.$el.append($button);
+
+      $button.on("click", () => {
+          let selectedBoxForDeletion = $(this.$el);
+          // debugger;
+          this.removeChildElement(selectedBoxForDeletion);
+      });
+    }
+
+    removeChildElement(element) {
+        // debugger;
+        var index = this.label;
+        element.remove();
+        this.parentElement.childElements.splice(index - 1, 1);
+        this.parentElement.childElements.forEach(function(element) {
+          if (element.label > index) {
+            element.label--;
+          };
+        })
+        // debugger;
+        this.parentElement.layout();
+    }
 }
 
 class SimpleContainer extends BaseElement {
     constructor() {
         super();
         this.childElements = [];
+        this.slideCount = 1;
     }
 
     render() {
         this.$el = $("<div/>");
         this.$el.addClass("element");
-
-        this.addChildElement(new SimpleBox("SimpleBox"));
-
+        this.addChildElement(new SimpleBox(1));
         return this.$el;
     }
 
-    layout(bounds){
-        this.childElements[0].layout(bounds);
+    layout(){
+      let simpleBoxWidth = ((window.innerWidth - 120) / this.childElements.length)
+      // debugger;
+      this.childElements.forEach(function(element, index) {
+        debugger;
+        element.layout({
+          top: (window.innerHeight - 100) / 3,
+          left: (simpleBoxWidth * index) + 20,
+          width: simpleBoxWidth - 20,
+          height: 100
+        }, true);
+      })
     }
 
     renderUI() {
-        var $button = $("<div/>").addClass("control").text("Change Color");
+        var $button = $("<div/>").addClass("control").text("Add Item");
         this.$el.append($button);
 
         $button.on("click", () => {
-            this.childElements[0].$el.css("background", "orange");
+            this.addChildElement(new SimpleBox(this.slideCount));
         });
     }
 
@@ -113,8 +158,8 @@ class SimpleContainer extends BaseElement {
         element.parentElement = this;
 
         this.$el.append(element.render());
+        this.slideCount++;
         element.renderUI();
+        this.layout();
     }
 }
-
-
