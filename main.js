@@ -5,8 +5,6 @@ class App {
 
         this.canvas.addElement(new SimpleContainer());
 
-
-
         this.canvas.layout(false);
         $(window).on("resize", () => {
             this.canvas.layout(false);
